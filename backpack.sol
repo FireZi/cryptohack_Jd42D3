@@ -17,7 +17,7 @@ contract backpack
          contract_owner = _contract_owner;
     }                  
     
-    function sendToken(uint receiver, uint amount, uint value) {
+    function sendToken(address receiver, uint amount, uint value) {
         if (msg.sender != exchange_adress && msg.sender != contract_owner) {
             return;
         }
