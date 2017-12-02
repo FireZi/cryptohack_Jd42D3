@@ -132,5 +132,6 @@ contract Exchange
         transactions[index] = transactions[transactions.length - 1];
         delete transactions[transactions.length - 1];
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = index;
+        checkCoef();
     }
 }
