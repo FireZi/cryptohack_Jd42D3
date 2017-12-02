@@ -31,11 +31,15 @@ contract Exchange
        uint indexTransactions;
     }
     
+    struct Array
+    {
+        Debt [] arr;
+    }
+    
     //queue on 2 arrays
     struct Queue
     {
-        Debt [] front;
-        Debt [] back;
+        Array [2] q;
     }
     
     //queues for Tokens
@@ -47,7 +51,7 @@ contract Exchange
     {
         if(currencyFrom > 2 || currencyTo > 2) //check whether he send me money on token
             return;
-        transactions.push(Transaction(msg.sender, currencyFrom, currencyTo, valueFrom));
+        transactions.push(Transaction(msg.sender, currencyFrom, currencyTo, valueFrom, 0));
         Debts[currencyTo].back.push(Debt(msg.sender, currencyFrom, valueFrom, ));
         endBlock.push(Block);
         tokenAmount[currencyFrom] += valueFrom;
