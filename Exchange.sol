@@ -11,6 +11,8 @@ contract Exchange
         uint8 currencyFrom;
         uint8 currencyTo;
         uint valueFrom;
+        uint8 indQueue;
+        uint indexArray;
     }
     
     //two different array for local testing machine
@@ -26,7 +28,7 @@ contract Exchange
        address sender;
        uint8 currencyFrom;
        uint valueFrom;
-       uint EndBlock;
+       uint indexTransactions;
     }
     
     //queue on 2 arrays
@@ -39,13 +41,14 @@ contract Exchange
     //queues for Tokens
     Queue [3] Debts;
     
+    
     //receive transaction
     function transfer(uint8 currencyFrom, uint8 currencyTo, uint valueFrom, uint Block)
     {
         if(currencyFrom > 2 || currencyTo > 2) //check whether he send me money on token
             return;
         transactions.push(Transaction(msg.sender, currencyFrom, currencyTo, valueFrom));
-        Debts[currencyTo].back.push(Debt(msg.sender, currencyFrom, valueFrom, endBlock.length));
+        Debts[currencyTo].back.push(Debt(msg.sender, currencyFrom, valueFrom, ));
         endBlock.push(Block);
         tokenAmount[currencyFrom] += valueFrom;
         while(Debts[currencyFrom].front.length != 0|| Debts[currencyFrom].back.length != 0)
