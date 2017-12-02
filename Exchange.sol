@@ -1,24 +1,5 @@
 pragma solidity ^0.4.5;
 
-contract Token0
-{
-    mapping (address => uint) balances;
-    function give(uint amount)
-    {
-        balances[msg.sender] += amount;
-    }
-    function send(address receiver, uint amount)
-    {
-        if(balances[msg.sender] < amount) return;
-        balances[msg.sender] -= amount;
-        balances[receiver] += amount;
-    }
-    function queryBalance(address addr) constant returns (uint balance)
-    {
-        balance = balances[addr];
-    }
-}
-
 contract Exchange
 {
     //token wallet
@@ -33,7 +14,7 @@ contract Exchange
         uint8 currencyFrom;
         uint8 currencyTo;
         uint valueFrom;
-        uint8 indQueue;
+        uint8 indexQueue;
         uint indexArray;
     }
     
@@ -66,6 +47,8 @@ contract Exchange
     
     //queues for Tokens
     Queue [3] Debts;
+    
+    uint INF = 1 << 200;
     
     function Exchange()
     {
@@ -102,21 +85,49 @@ contract Exchange
             {
                 while(Debts[currencyFrom].q[0].arr.length != 0)
                 {
+                    //MEMORY
                     Debts[currencyFrom].q[1].arr.push(Debts[currencyFrom].q[0].arr[Debts[currencyFrom].q[0].arr.length - 1]);
                     delete Debts[currencyFrom].q[0].arr[Debts[currencyFrom].q[0].arr.length - 1];
+                    transactions[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions].indexQueue = 1;
+                    transactions[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions].indexArray = Debts[currencyFrom].q[1].arr.length - 1;
                 }
             }
-            while(Debts[currencyFrom].q[1].arr.length != 0 && tokenAmount[currencyFrom] >=
+            while(Debts[currencyFrom].q[1].arr.length != 0)
+            {
+                if(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions == INF)
+                {
+                    delete Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1];
+                    continue;
+                }
+                if(tokenAmount[currencyFrom] <
+                    Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
+                    btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
+                    btcToken[currencyFrom])
+                    break; 
+                //как послать команду токену на перевод валюты с нашего кошелька на его кошелек
+                //----------------------------------------------------------------------------
+                //
+                //
+                //
+                //
+                Debts[transactions[transactions.length - 1].currencyTo].q[transactions[transactions.length - 1].indexQueue].arr[transactions[transactions.length - 1].indexArray].indexTransactions = 
+                Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions;
+                transactions[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions] = 
+                transactions[transactions.length - 1];
+                delete transactions[transactions.length - 1];
+                delete Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1];
+            }
+            if(
+            Debts[currencyFrom].q[1].arr.length != 0 && tokenAmount[currencyFrom] <
             Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
             btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
             btcToken[currencyFrom])
-            {
-                //как послать команду токену на перевод валюты с нашего кошелька на его кошелек
-                Token0.send();
-            }
-            
+                break;
         }
+        checkCoef();
     }
-    
-    
+    function deleteIndex(uint index)
+    {
+        
+    }
 }
