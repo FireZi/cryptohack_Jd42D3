@@ -23,13 +23,13 @@ contract backpack
         }
         
         if (value == 0) {
-            Token0_address.call(bytes4(sha3("send")), receiver, amount);
+            Token0_address.call(bytes4(sha3("send(address, uint)")), receiver, amount);
         }
         if (value == 1) {
-            Token0_address.call(bytes4(sha3("send")), receiver, amount);
+            Token0_address.call(bytes4(sha3("send(address, uint)")), receiver, amount);
         }
         if (value == 2) {
-            Token2_address.call(bytes4(sha3("send")), receiver, amount);
+            Token2_address.call(bytes4(sha3("send(address, uint)")), receiver, amount);
         }
     }
     
@@ -37,7 +37,7 @@ contract backpack
         if (msg.sender != contract_owner) {
             return;
         }
-        exchange_adress.call(bytes4(sha3("transfer")), currencyFrom, currencyTo, valueFrom, Block);
+        exchange_adress.call(bytes4(sha3("transfer(uint8, uint8, uint, uint)")), currencyFrom, currencyTo, valueFrom, Block);
     }
 
 }
