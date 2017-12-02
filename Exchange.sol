@@ -1,14 +1,12 @@
 pragma solidity ^0.4.5;
 
-import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
-
 contract Exchange
 {
     //token wallet
     uint [3] tokenAmount;
-
-    uint lastBlock;
-
+    
+    uint lastBlock; 
+    
     //node for transactions
     struct Transaction
     {
@@ -19,23 +17,17 @@ contract Exchange
         uint8 indexQueue;
         uint indexArray;
     }
-
+    
     //two different array for local testing machine
     Transaction [] transactions;
     uint [] endBlock;
-
+    
     //coef Tokens to BTC
-    //struct BtcTokens {
-        //uint[] tokens;
-    //}
-
-    //BtcTokens btcTokens;
-
-    //Oracle oracle;
-
-    uint[] btcTokens;
-    TestOracle testOracle;
-
+    uint [3] btcToken;
+    
+    event ToOracleUpdate();
+    uint lastUpdateBlock = 0;
+    
     //queue node
     struct Debt
     {
@@ -44,49 +36,49 @@ contract Exchange
        uint valueFrom;
        uint indexTransactions;
     }
-
+    
     struct Array
     {
         Debt [] arr;
     }
-
+    
     //queue on 2 arrays
     struct Queue
     {
         Array [2] q;
     }
-
+    
     //queues for Tokens
     Queue [3] Debts;
-
+    
     uint INF = 1 << 200;
-
+    
     function Exchange()
     {
         tokenAmount[0] = tokenAmount[1] = tokenAmount[2] = 0;
         lastBlock = 0;
         checkCoef();
     }
-
+    
     function checkCoef()
     {
         if(block.number - lastBlock < 10)
             return;
         lastBlock = block.number;
-
-        //oracle.updatePrice();
-        //btcTokens = oracle.btcTokens;
-
-        btcTokens = testOracle.updatePrice();
+        //
+        //
+        //HERE PLEASE WORK WITH ORAKUL AND MAKE ETHEREUM GREAT AGAIN
+        //
+        //
     }
-
+    
     //receive transaction
     function transfer(uint8 currencyFrom, uint8 currencyTo, uint valueFrom, uint Block)
     {
         if(currencyFrom > 2 || currencyTo > 2) //check whether he send me money on token
             return;
         Debts[currencyTo].q[0].arr.push(Debt(msg.sender, currencyFrom, valueFrom, transactions.length));
-        transactions.push(Transaction(msg.sender, currencyFrom, currencyTo, valueFrom, 0,
+        transactions.push(Transaction(msg.sender, currencyFrom, currencyTo, valueFrom, 0, 
         Debts[currencyTo].q[0].arr.length - 1));
         endBlock.push(Block);
         tokenAmount[currencyFrom] += valueFrom;
@@ -111,19 +103,19 @@ contract Exchange
                     continue;
                 }
                 if(tokenAmount[currencyFrom] <
-                    Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom *
-                    btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] /
+                    Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
+                    btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
                     btcToken[currencyFrom])
-                    break;
+                    break; 
                 //как послать команду токену на перевод валюты с нашего кошелька на его кошелек
                 //----------------------------------------------------------------------------
                 //
                 //
                 //
                 //
-                Debts[transactions[transactions.length - 1].currencyTo].q[transactions[transactions.length - 1].indexQueue].arr[transactions[transactions.length - 1].indexArray].indexTransactions =
+                Debts[transactions[transactions.length - 1].currencyTo].q[transactions[transactions.length - 1].indexQueue].arr[transactions[transactions.length - 1].indexArray].indexTransactions = 
                 Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions;
-                transactions[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions] =
+                transactions[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions] = 
                 transactions[transactions.length - 1];
                 endBlock[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions] = endBlock[transactions.length - 1];
                 delete endBlock[endBlock.length - 1];
@@ -132,13 +124,14 @@ contract Exchange
             }
             if(
             Debts[currencyFrom].q[1].arr.length != 0 && tokenAmount[currencyFrom] <
-            Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom *
-            btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] /
+            Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
+            btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
             btcToken[currencyFrom])
                 break;
         }
         checkCoef();
     }
+    
     function deleteIndex(uint index)
     {
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = INF;
@@ -149,46 +142,20 @@ contract Exchange
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = index;
         checkCoef();
     }
-}
-
-contract Oracle is usingOraclize {
-
-    struct BtcTokens {
-        uint[] tokens;
-    }
-
-    event updatedPrice(uint[3] price);
-    event newOraclizeQuery(string description);
-
-    function Oracle() payable {
-        updatePrice();
-    }
-
-    function __callback(bytes32 myid, uint[3] result) {
-        if (msg.sender != oraclize_cbAddress()) throw;
-
-        // WARNING! IDK ABOUT HOW THE SOLIDITY ARRAYS WORK
-        btcToken = result;
-        updatedPrice(result);
-    }
-
-    function updatePrice() payable {
-        if (oraclize_getPrice("URL") > this.balance) {
-            newOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
-        } else {
-            newOraclizeQuery("Oraclize query was sent, standing by for the answer..");
-            //TO DO
-            oraclize_query("URL", "json(http://api.fixer.io/latest?symbols=USD,GBP).rates.GBP");
+    
+    function checkToUpdate() private {
+        if (lastUpdateBlock + 100 > block.number) {
+            updateCurrency();
         }
     }
-}
-
-
-contract TestOracle {
-
-    uint[] testBtcRate = [228, 322, 1488];
-
-    function updatePrice() {
-        return testBtcRate;
+    
+    function updateCurrency() private {
+        ToOracleUpdate();
+    }
+    
+    function currencyFromOracle(uint token0, uint token1, uint token2) {
+        btcToken[0] = token0;
+        btcToken[1] = token1;
+        btcToken[2] = token2;
     }
 }
