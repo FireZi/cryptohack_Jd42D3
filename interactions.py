@@ -7,6 +7,6 @@ def get_end_blocks():
 
 def check_to_end(index):
 	web3.personal.unlockAccount(wallet_address, wallet_password)
-    contract_instance.checkToEnd(index, transact={'from': wallet_address})
+	contract_instance.checkToEnd(index, transact={'from': wallet_address})
 
 
