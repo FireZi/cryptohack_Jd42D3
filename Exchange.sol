@@ -114,6 +114,8 @@ contract Exchange
                 Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions;
                 transactions[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions] = 
                 transactions[transactions.length - 1];
+                endBlock[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions] = endBlock[transactions.length - 1];
+                delete endBlock[endBlock.length - 1];
                 delete transactions[transactions.length - 1];
                 delete Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1];
             }
@@ -130,7 +132,9 @@ contract Exchange
     {
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = INF;
         transactions[index] = transactions[transactions.length - 1];
+        endBlock[index ] = endBlock[endBlock.length - 1];
         delete transactions[transactions.length - 1];
+        delete endBlock[endBlock.length - 1];
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = index;
         checkCoef();
     }
