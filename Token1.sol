@@ -14,6 +14,6 @@ contract Token1
     }
     function queryBalance(address addr) constant returns (uint balance)
     {
-        return balances[addr];
+        balance = balances[addr];
     }
 }
