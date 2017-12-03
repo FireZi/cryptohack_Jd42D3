@@ -27,16 +27,16 @@ contract backpack
         }
         
         if (value == 0) {
-            Token0 buffer = Token0(Token0_address);
-            buffer.send(exchange_address, amount);
+            Token0 buffer0 = Token0(Token0_address);
+            buffer0.send(exchange_address, amount);
         }
         if (value == 1) {
-            Token1 buffer = Token1(Token1_address);
-            buffer.send(exchange_address, amount);
+            Token1 buffer1 = Token1(Token1_address);
+            buffer1.send(exchange_address, amount);
         }
         if (value == 2) {
-            Token2 buffer = Token2(Token2_address);
-            buffer.send(exchange_address, amount);
+            Token2 buffer2 = Token2(Token2_address);
+            buffer2.send(exchange_address, amount);
         }
     }
     
