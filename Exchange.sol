@@ -4,6 +4,7 @@ contract Exchange
 {
     //token wallet
     uint [3] tokenAmount;
+    address [3] tokenAddress;
     
     uint lastBlock; 
     
@@ -53,9 +54,12 @@ contract Exchange
     
     uint INF = 1 << 200;
     
-    function Exchange()
+    function Exchange(address Token0, address Token1, address Token2)
     {
         tokenAmount[0] = tokenAmount[1] = tokenAmount[2] = 0;
+        tokenAddress[0] = Token0;
+        tokenAddress[1] = Token1;
+        tokenAddress[2] = Token2;
         lastBlock = 0;
         checkCoef();
     }
@@ -77,6 +81,8 @@ contract Exchange
     {
         if(currencyFrom > 2 || currencyTo > 2) //check whether he send me money on token
             return;
+        msg.sender.call(bytes4(sha3("sendToken(uint, uint)")), valueFrom, currencyFrom);
+        
         Debts[currencyTo].q[0].arr.push(Debt(msg.sender, currencyFrom, valueFrom, transactions.length));
         transactions.push(Transaction(msg.sender, currencyFrom, currencyTo, valueFrom, 0, 
         Debts[currencyTo].q[0].arr.length - 1));
@@ -107,9 +113,13 @@ contract Exchange
                     btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
                     btcToken[currencyFrom])
                     break; 
-                //как послать команду токену на перевод валюты с нашего кошелька на его кошелек
+                //
                 //----------------------------------------------------------------------------
                 //
+                tokenAddress[currencyFrom].call(bytes4(sha3("send(address, uint)")), Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
+                Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
+                    btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
+                    btcToken[currencyFrom]);
                 //
                 //
                 //
