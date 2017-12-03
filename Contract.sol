@@ -294,7 +294,7 @@ contract Exchange
     }
 
      function checkToDelete(uint index) {
-         if (endBlock[index] > block.number) {
+         if (endBlock[index] <= block.number) {
              deleteIndex(index);
          }
      }
