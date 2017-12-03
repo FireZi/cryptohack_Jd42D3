@@ -262,14 +262,15 @@ contract Exchange
     {
         //convert curFrom to curTo in amount of valueFrom amd sends it on exchange wallet;
         //uint balance = grtfromOracle;
-        uint balance = valueFrom * btcToken[currencyFrom] / btcToken[currencyTo];
-        if (currencyTo == 0) {
+        //uint balance = valueFrom * btcToken[currencyFrom] / btcToken[currencyTo];
+        uint balance = valueFrom;
+        if (currencyFrom == 0) {
             Token0(tokenAddress[0]).send(sender, balance);
         }
-        if (currencyTo == 1) {
+        if (currencyFrom == 1) {
             Token1(tokenAddress[1]).send(sender, balance);
         }
-        if (currencyTo == 2) {
+        if (currencyFrom == 2) {
             Token2(tokenAddress[2]).send(sender, balance);
         }
         
