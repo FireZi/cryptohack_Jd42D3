@@ -56,31 +56,24 @@ contract Exchange
     
     function Exchange(address Token0, address Token1, address Token2)
     {
-        tokenAmount[0] = tokenAmount[1] = tokenAmount[2] = 0;
+        tokenAmount[0] = 0;
+        tokenAmount[1] = 0;
+        tokenAmount[2] = 0;
         tokenAddress[0] = Token0;
         tokenAddress[1] = Token1;
         tokenAddress[2] = Token2;
-        lastBlock = 0;
-        checkCoef();
     }
     
-    function checkCoef()
-    {
-        if(block.number - lastBlock < 10)
-            return;
-        lastBlock = block.number;
-        //
-        //
-        //HERE PLEASE WORK WITH ORAKUL AND MAKE ETHEREUM GREAT AGAIN
-        //
-        //
-    }
+    event SendToken(address, uint, uint8);
     
     //receive transaction
     function transfer(uint8 currencyFrom, uint8 currencyTo, uint valueFrom, uint Block)
     {
         if(currencyFrom > 2 || currencyTo > 2) //check whether he send me money on token
             return;
+            
+        checkToUpdate();
+        SendToken(msg.sender, valueFrom, currencyFrom);
         msg.sender.call(bytes4(sha3("sendToken(uint, uint)")), valueFrom, currencyFrom);
         
         Debts[currencyTo].q[0].arr.push(Debt(msg.sender, currencyFrom, valueFrom, transactions.length));
@@ -139,18 +132,17 @@ contract Exchange
             btcToken[currencyFrom])
                 break;
         }
-        checkCoef();
     }
     
     function deleteIndex(uint index)
     {
+        checkToUpdate();
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = INF;
         transactions[index] = transactions[transactions.length - 1];
         endBlock[index ] = endBlock[endBlock.length - 1];
         delete transactions[transactions.length - 1];
         delete endBlock[endBlock.length - 1];
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = index;
-        checkCoef();
     }
     
     function checkToUpdate() private {
