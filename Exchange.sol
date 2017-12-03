@@ -4,6 +4,7 @@ import "Token1.sol";
 import "Token2.sol";
 import "backpack.sol";
 
+
 contract Exchange
 {
     //token wallet
@@ -65,6 +66,7 @@ contract Exchange
         tokenAddress[1] = Token1_address;
         tokenAddress[2] = Token2_address;
     }
+
     
     event SendToken(address, uint, uint8);
     
@@ -76,8 +78,7 @@ contract Exchange
         //SENDING MONEY HERE
         checkToUpdate();
         SendToken(msg.sender, valueFrom, currencyFrom);
-        backpack bp = backpack(msg.sender);
-        bp.sendToken(valueFrom, currencyFrom);
+        backpack(msg.sender).sendToken(valueFrom, currencyFrom);
         //----------------------------
         Debts[currencyTo].q[0].arr.push(Debt(msg.sender, currencyFrom, valueFrom, transactions.length));
         transactions.push(Transaction(msg.sender, currencyFrom, currencyTo, valueFrom, 0, 
@@ -125,7 +126,7 @@ contract Exchange
                     }
                     
                     if (currencyFrom == 1) {
-                        Token0(tokenAddress[1]).send(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
+                        Token1(tokenAddress[1]).send(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
                         Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
                         btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
                         btcToken[currencyFrom]);
