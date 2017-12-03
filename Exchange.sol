@@ -118,24 +118,21 @@ contract Exchange
                     btcToken[currencyFrom];
                 //SENDMONEY MONEY HERE
                     if (currencyFrom == 0) {
-                        Token0 buffer0 = Token0(tokenAddress[0]);
-                        buffer0.send(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
+                        Token0(tokenAddress[0]).send(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
                         Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
                         btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
                         btcToken[currencyFrom]);
                     }
                     
                     if (currencyFrom == 1) {
-                        Token1 buffer1 = Token1(tokenAddress[1]);
-                        buffer1.send(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
+                        Token0(tokenAddress[1]).send(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
                         Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
                         btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
                         btcToken[currencyFrom]);
                     }
                     
                     if (currencyFrom == 2) {
-                        Token2 buffer2 = Token2(tokenAddress[2]);
-                        buffer2.send(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
+                        Token2(tokenAddress[2]).send(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
                         Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
                         btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
                         btcToken[currencyFrom]);                 
