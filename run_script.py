@@ -5,7 +5,7 @@ token_addresses = [3]
 
 
 def load_tokens(id):
-    contract_fs = open('contracts/Token' + id + '.sol', 'r')
+    contract_fs = open('Token' + id + '.sol', 'r')
     contract_source_code = ''.join(contract_fs.readlines())
     compiled_sol = compile_source(contract_source_code)
     contract_interface = compiled_sol['<stdin>:Token' + id]
@@ -16,8 +16,8 @@ def load_tokens(id):
 
 
 wallet_pass = '123'
-exchange_wallet = None
-client_wallet = None
+exchange_wallet = '0x1c7202902d04843280A0678DFE09653ad225BDA0'
+client_wallet = '0xC63C28787599Dac33C6AE1C7957d92215CdeadFF'
 web3.personal.unlockAccount(exchange_wallet, wallet_pass);
 web3.personal.unlockAccount(client_wallet, wallet_pass);
 
@@ -25,7 +25,7 @@ load_tokens(0)
 load_tokens(1)
 load_tokens(2)
 
-contract_fs = open('contracts/Exchange.sol', 'r')
+contract_fs = open('Exchange.sol', 'r')
 contract_source_code = ''.join(contract_fs.readlines())
 compiled_sol = compile_source(contract_source_code)
 contract_interface = compiled_sol['<stdin>:Exchange']
@@ -37,7 +37,7 @@ exchange_address = tx_receipt['contractAddress']
 print('Exchange uploaded on ' + exchange_address)
 
 
-contract_fs = open('contracts/backpack.sol', 'r')
+contract_fs = open('backpack.sol', 'r')
 contract_source_code = ''.join(contract_fs.readlines())
 compiled_sol = compile_source(contract_source_code)
 contract_interface = compiled_sol['<stdin>:backpack']

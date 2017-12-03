@@ -161,7 +161,7 @@ contract Exchange
         }
     }
     
-    function deleteIndex(uint index) public
+    function deleteIndex(uint index) private
     {
         checkToUpdate();
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = INF;
@@ -170,6 +170,16 @@ contract Exchange
         delete transactions[transactions.length - 1];
         delete endBlock[endBlock.length - 1];
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = index;
+    }
+
+    function checkToDelete(uint index) {
+        if (endBlock[index] > block.number) {
+            deleteIndex(index);
+        }
+    }
+
+    function getEndBlock() constant returns (uint[] endBlocks) {
+        endBlocks = endBlock;
     }
     
     function checkToUpdate() private {
