@@ -6,8 +6,6 @@ contract Exchange
     uint[3] public tokenAmount;
     address[3] public tokenAddress;
     
-    uint lastBlock; 
-    
     //node for transactions
     struct Transaction
     {
@@ -20,7 +18,7 @@ contract Exchange
     }
     
     //two different array for local testing machine
-    Transaction[] transactions;
+    Transaction[] public transactions;
     uint[] public endBlock;
     
     //coef Tokens to BTC
@@ -54,33 +52,34 @@ contract Exchange
     
     uint INF = 1 << 200;
     
-    function Exchange(address Token0, address Token1, address Token2)
+    function Exchange()//address Token0, address Token1, address Token2)
     {
         tokenAmount[0] = 0;
         tokenAmount[1] = 0;
         tokenAmount[2] = 0;
-        tokenAddress[0] = Token0;
-        tokenAddress[1] = Token1;
-        tokenAddress[2] = Token2;
+        //tokenAddress[0] = Token0;
+        //tokenAddress[1] = Token1;
+        //tokenAddress[2] = Token2;
     }
     
     event SendToken(address, uint, uint8);
     
     //receive transaction
-    function transfer(uint8 currencyFrom, uint8 currencyTo, uint valueFrom, uint Block)
+    function transfer(uint8 currencyFrom, uint8 currencyTo, uint valueFrom, uint Block) public
     {
         if(currencyFrom > 2 || currencyTo > 2) //check whether he send me money on token
             return;
-            
+        //SENDING MONEY HERE
         checkToUpdate();
         SendToken(msg.sender, valueFrom, currencyFrom);
-        msg.sender.call(bytes4(sha3("sendToken(uint, uint)")), valueFrom, currencyFrom);
-        
+        //----------------------------
         Debts[currencyTo].q[0].arr.push(Debt(msg.sender, currencyFrom, valueFrom, transactions.length));
         transactions.push(Transaction(msg.sender, currencyFrom, currencyTo, valueFrom, 0, 
         Debts[currencyTo].q[0].arr.length - 1));
         endBlock.push(Block);
         tokenAmount[currencyFrom] += valueFrom;
+        for(int i = 0; i < 2; i++)
+        {
         while(Debts[currencyFrom].q[0].arr.length + Debts[currencyFrom].q[1].arr.length != 0)
         {
             if(Debts[currencyFrom].q[1].arr.length == 0)
@@ -90,6 +89,7 @@ contract Exchange
                     //MEMORY
                     Debts[currencyFrom].q[1].arr.push(Debts[currencyFrom].q[0].arr[Debts[currencyFrom].q[0].arr.length - 1]);
                     delete Debts[currencyFrom].q[0].arr[Debts[currencyFrom].q[0].arr.length - 1];
+                    Debts[currencyFrom].q[0].arr.length--;
                     transactions[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions].indexQueue = 1;
                     transactions[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions].indexArray = Debts[currencyFrom].q[1].arr.length - 1;
                 }
@@ -99,6 +99,7 @@ contract Exchange
                 if(Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions == INF)
                 {
                     delete Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1];
+                    Debts[currencyFrom].q[1].arr.length--;
                     continue;
                 }
                 if(tokenAmount[currencyFrom] <
@@ -106,15 +107,11 @@ contract Exchange
                     btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
                     btcToken[currencyFrom])
                     break; 
-                //
-                //----------------------------------------------------------------------------
-                //
-                tokenAddress[currencyFrom].call(bytes4(sha3("send(address, uint)")), Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].sender,
-                Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
+                tokenAmount[currencyFrom] -= Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].valueFrom * 
                     btcToken[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].currencyFrom] / 
-                    btcToken[currencyFrom]);
-                //
-                //
+                    btcToken[currencyFrom];
+                //SENDMONEY MONEY HERE
+                
                 //
                 Debts[transactions[transactions.length - 1].currencyTo].q[transactions[transactions.length - 1].indexQueue].arr[transactions[transactions.length - 1].indexArray].indexTransactions = 
                 Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions;
@@ -122,8 +119,11 @@ contract Exchange
                 transactions[transactions.length - 1];
                 endBlock[Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1].indexTransactions] = endBlock[transactions.length - 1];
                 delete endBlock[endBlock.length - 1];
+                endBlock.length--;
                 delete transactions[transactions.length - 1];
+                transactions.length--;
                 delete Debts[currencyFrom].q[1].arr[Debts[currencyFrom].q[1].arr.length - 1];
+                Debts[currencyFrom].q[1].arr.length--;
             }
             if(
             Debts[currencyFrom].q[1].arr.length != 0 && tokenAmount[currencyFrom] <
@@ -132,9 +132,11 @@ contract Exchange
             btcToken[currencyFrom])
                 break;
         }
+        currencyFrom = currencyTo;
+        }
     }
     
-    function deleteIndex(uint index)
+    function deleteIndex(uint index) public
     {
         checkToUpdate();
         Debts[transactions[index].currencyTo].q[transactions[index].indexQueue].arr[transactions[index].indexArray].indexTransactions = INF;
@@ -146,7 +148,8 @@ contract Exchange
     }
     
     function checkToUpdate() private {
-        if (lastUpdateBlock + 100 > block.number) {
+        if (lastUpdateBlock + 100 < block.number) {
+            lastUpdateBlock = block.number;
             updateCurrency();
         }
     }
@@ -155,7 +158,7 @@ contract Exchange
         ToOracleUpdate();
     }
     
-    function currencyFromOracle(uint token0, uint token1, uint token2) {
+    function currencyFromOracle(uint token0, uint token1, uint token2) public {
         btcToken[0] = token0;
         btcToken[1] = token1;
         btcToken[2] = token2;
