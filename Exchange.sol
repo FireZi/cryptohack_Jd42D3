@@ -3,8 +3,8 @@ pragma solidity ^0.4.5;
 contract Exchange
 {
     //token wallet
-    uint [3] tokenAmount;
-    address [3] tokenAddress;
+    uint[3] public tokenAmount;
+    address[3] public tokenAddress;
     
     uint lastBlock; 
     
@@ -20,11 +20,11 @@ contract Exchange
     }
     
     //two different array for local testing machine
-    Transaction [] transactions;
-    uint [] endBlock;
+    Transaction[] transactions;
+    uint[] public endBlock;
     
     //coef Tokens to BTC
-    uint [3] btcToken;
+    uint[3] public btcToken;
     
     event ToOracleUpdate();
     uint lastUpdateBlock = 0;
@@ -40,13 +40,13 @@ contract Exchange
     
     struct Array
     {
-        Debt [] arr;
+        Debt[] arr;
     }
     
     //queue on 2 arrays
     struct Queue
     {
-        Array [2] q;
+        Array[2] q;
     }
     
     //queues for Tokens
